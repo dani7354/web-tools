@@ -133,7 +133,7 @@ def try_passwords_form_with_csrf_token(word_queue, username):
                 else:
                     print(f"{password} => {response.status_code}")
                 csrf_token = get_csrf_token(response.content.decode())
-            except requests.exceptions.BaseHTTPError:
+            except requests.exceptions.ConnectionError:
                 sys.stderr.write(CONNECTION_ERROR_MSG)
                 sys.stderr.flush()
                 continue
