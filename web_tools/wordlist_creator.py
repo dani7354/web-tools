@@ -7,6 +7,7 @@ import requests
 import threading
 import re
 import os
+import sys
 import queue
 
 class TagStripper(HTMLParser):
@@ -28,7 +29,7 @@ class TagStripper(HTMLParser):
 VALID_WORD_PATTERN = "[a-zA-Z]\w{2,}"
 
 USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:19.0) Gecko/20100101 Firefox/19.0"
-THREADS = 4
+THREADS = 8
 
 
 def get_args():
@@ -67,7 +68,6 @@ def write_to_file(words, filename_base) -> str:
             word_list.write(f"{word}\n")
     return filename_final
 
-
 def get_words(urls, found_words) -> None:
     words = []
     url = ""
@@ -80,19 +80,16 @@ def get_words(urls, found_words) -> None:
             content_stripped = tag_stripper.strip(content)
             words_from_content = re.findall(VALID_WORD_PATTERN, content_stripped)
             [words.extend(mangle_word(w.lower())) for w in words_from_content]
-        except RequestException as ex:
-            print(f"Something went wrong while getting words from url {url}. Exception: {ex}")
+        except RequestException as e:
+            print(f"Something went wrong while getting words from url {url}. Exception: {e}")
             continue
 
     for word in words:
         found_words.put(word)
 
-
-
 def read_urls(file) -> list:
     with file as url_list:
         return url_list.readlines()
-
 
 def main():
     args = get_args()
@@ -124,4 +121,8 @@ def main():
     print("Script done!")
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as ex:
+        print(ex)
+        sys.exit(1)
