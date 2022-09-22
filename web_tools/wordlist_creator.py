@@ -10,7 +10,6 @@ import os
 import sys
 import queue
 
-
 VALID_WORD_PATTERN = "[a-zA-Z]\w{2,}"
 USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:19.0) Gecko/20100101 Firefox/19.0"
 THREADS = 8
@@ -38,15 +37,17 @@ def get_args():
                         help="Text file containing URLs to scrape for elements (one per line).")
     return parser.parse_args()
 
+
 def get_html_string(url):
-    headers = { "User-Agent": USER_AGENT }
+    headers = {"User-Agent": USER_AGENT}
     response = requests.get(url, headers=headers)
 
     return response.content.decode() if response.status_code in (200, 301, 302) else ""
 
-def mangle_word(word) -> list: # TODO: finish suffixes
+
+def mangle_word(word) -> list:  # TODO: finish suffixes
     current_year = datetime.now().year
-    suffixes = [ "", "#", f"{current_year}!", current_year ]
+    suffixes = ["", "#", f"{current_year}!", current_year]
     mangled = []
 
     for w in (word, word.capitalize()):
@@ -54,6 +55,7 @@ def mangle_word(word) -> list: # TODO: finish suffixes
             mangled.append(f"{w}{s}")
 
     return mangled
+
 
 def write_to_file(words, filename_base) -> str:
     filename_final = f"{filename_base}.txt"
@@ -68,10 +70,11 @@ def write_to_file(words, filename_base) -> str:
             word_list.write(f"{word}\n")
     return filename_final
 
+
 def get_words(urls, found_words) -> None:
     words = []
     url = ""
-    while not  urls.empty():
+    while not urls.empty():
         try:
             url = urls.get()
             print(f"GET: {url}")
@@ -87,9 +90,11 @@ def get_words(urls, found_words) -> None:
     for word in words:
         found_words.put(word)
 
+
 def read_urls(file) -> list:
     with file as url_list:
         return url_list.readlines()
+
 
 def main():
     args = get_args()
@@ -119,6 +124,7 @@ def main():
     filename = write_to_file(words_set, f"wordlist_{time_str}")
     print(f"{len(words_set)} words was written to {filename}")
     print("Script done!")
+
 
 if __name__ == "__main__":
     try:
