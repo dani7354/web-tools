@@ -10,6 +10,12 @@ import os
 import sys
 import queue
 
+
+VALID_WORD_PATTERN = "[a-zA-Z]\w{2,}"
+USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:19.0) Gecko/20100101 Firefox/19.0"
+THREADS = 8
+
+
 class TagStripper(HTMLParser):
     def __init__(self):
         HTMLParser.__init__(self)
@@ -24,12 +30,6 @@ class TagStripper(HTMLParser):
     def strip(self, html) -> str:
         self.feed(html)
         return " ".join(self.text)
-
-
-VALID_WORD_PATTERN = "[a-zA-Z]\w{2,}"
-
-USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:19.0) Gecko/20100101 Firefox/19.0"
-THREADS = 8
 
 
 def get_args():
