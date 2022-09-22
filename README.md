@@ -8,3 +8,6 @@ Scans target web server for hidden directories and files. One or more wordlists 
 Performs brute-force password guessing against a target login site. 
 It supports basic auth, simple login forms and login forms with CSRF token validation. 
 It may be necessary to configure or change parts of the script for each target site.
+
+## wordlist_creator.py
+Creates a wordlist by scraping and filtering words from one or more websites.
