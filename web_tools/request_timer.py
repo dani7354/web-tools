@@ -18,7 +18,6 @@ def time_requests(url: str, count: int, page_start: int, page_end: int) -> list[
     """ Time requests to a URL
      :param url: URL as format string with one integer placeholder for page number
      :param count: number of rounds to request pages
-     :param pages: list of page numbers to request
      :param page_start: first page number to request
      :param page_end: last page number to request"""
 
