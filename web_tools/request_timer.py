@@ -6,7 +6,7 @@ import time
 
 
 def parse_arguments() -> argparse.Namespace:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Time requests to a URL")
     parser.add_argument("-u", "--url", dest="url", type=str, required=True)
     parser.add_argument("-c", "--count", dest="count", type=int, required=False, default=1)
     parser.add_argument("-p", "--pages", dest="pages", type=int, nargs="+", required=True)
