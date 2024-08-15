@@ -2,12 +2,12 @@
 import os
 import argparse
 import queue
-from threading import Thread
-
 import requests
 import xml.etree.ElementTree as ET
+from threading import Thread
 from datetime import datetime
 from slugify import slugify
+
 
 MAX_THREADS = 8
 
@@ -49,6 +49,7 @@ def download_next_file(items_queue: queue.Queue, directory: str) -> None:
 
         file_name = f"{slugify(title)}.mp3"
         full_path = os.path.join(directory, file_name)
+        print(f"Saving to {full_path}")
         with open(full_path, "wb") as file:
             file.write(response.content)
 
