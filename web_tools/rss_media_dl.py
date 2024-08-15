@@ -24,8 +24,8 @@ def read_rss_feed(url: str, directory: str) -> list[tuple[str, str]]:
     response = requests.get(url)
     response.raise_for_status()
 
-    os.path.join(directory, f"feed_{datetime.now().isoformat()}.rss")
-    with open("feed.rss", "w") as feed_file:
+    feed_rss_path = os.path.join(directory, f"feed_{datetime.now().isoformat()}.rss")
+    with open(feed_rss_path, "w") as feed_file:
         feed_file.write(response.text)
 
     rss_tree = ET.ElementTree(ET.fromstring(response.content))
