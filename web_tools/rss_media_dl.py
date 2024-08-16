@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-import os
 import argparse
+import os
 import queue
-import requests
 import xml.etree.ElementTree as ET
-from threading import Thread
 from datetime import datetime
-from slugify import slugify
+from threading import Thread
 
+import requests
+from slugify import slugify
 
 MAX_THREADS = 8
 
@@ -54,10 +54,15 @@ def download_next_file(items_queue: queue.Queue, directory: str) -> None:
             file.write(response.content)
 
 
-def main():
+def main() -> None:
     args = parse_arguments()
+
     print(f"Reading RSS feed at {args.url}...")
     items = read_rss_feed(args.url, args.dir)
+    if not items:
+        print("No items found in RSS feed")
+        return
+
     print(f"Downloaded {len(items)} items from RSS feed")
     items_queue = create_queue(items)
 
