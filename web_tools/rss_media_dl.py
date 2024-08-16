@@ -41,17 +41,25 @@ def create_queue(items) -> queue.Queue:
     return items_queue
 
 
+def save_file(title: str, directory: str, content: bytes):
+    file_name = f"{slugify(title)}.mp3"
+    full_path = os.path.join(directory, file_name)
+    counter = 1
+    while os.path.exists(full_path):
+        full_path = os.path.join(directory, f"{file_name}_{counter}.mp3")
+        counter += 1
+
+    print(f"Saving {title} to {full_path}")
+    with open(full_path, "wb") as file:
+        file.write(content)
+
+
 def download_next_file(items_queue: queue.Queue, directory: str) -> None:
     while not items_queue.empty():
         url, title = items_queue.get()
         print(f"Downloading {title}: {url}")
         response = requests.get(url)
-
-        file_name = f"{slugify(title)}.mp3"
-        full_path = os.path.join(directory, file_name)
-        print(f"Saving to {full_path}")
-        with open(full_path, "wb") as file:
-            file.write(response.content)
+        save_file(title, directory, response.content)
 
 
 def main() -> None:
