@@ -21,7 +21,7 @@ def parse_arguments() -> argparse.Namespace:
 
     return parser.parse_args()
 
-def filter_rss_items(item: tuple[str, str], words: Sequence[str]) -> bool:
+def is_match(item: tuple[str, str], words: Sequence[str]) -> bool:
     url, title = item
     for word in words:
         if word in title or word in url:
@@ -34,14 +34,14 @@ def read_rss_feed(url: str, directory: str, words: Sequence[str]) -> list[tuple[
     response = requests.get(url)
     response.raise_for_status()
 
-    feed_rss_path = os.path.join(directory, f"feed_{datetime.now().isoformat()}.rss")
+    feed_rss_path = os.path.join(directory, f"feed_{slugify(datetime.now().isoformat())}.rss")
     with open(feed_rss_path, "w") as feed_file:
         feed_file.write(response.text)
 
     rss_tree = ET.ElementTree(ET.fromstring(response.content))
     items = rss_tree.findall(".//item")
     item_tuples = filter(
-        lambda x: filter_rss_items(x, words),
+        lambda x: is_match(x, words),
         [(x.find("enclosure").get("url"), x.findtext("title")) for x in items])
 
     return list(item_tuples)
@@ -54,15 +54,14 @@ def create_queue(items) -> queue.Queue:
     return items_queue
 
 
-def save_file(title: str, directory: str, content: bytes):
-    file_name = f"{slugify(title)}.mp3"
-    full_path = os.path.join(directory, file_name)
+def save_file(filename: str, directory: str, content: bytes):
+    full_path = os.path.join(directory, filename)
     counter = 1
     while os.path.exists(full_path):
-        full_path = os.path.join(directory, f"{file_name}_{counter}.mp3")
+        full_path = os.path.join(directory, f"{filename}_{counter}.mp3")
         counter += 1
 
-    print(f"Saving {title} to {full_path}")
+    print(f"Saving {filename} to {full_path}")
     with open(full_path, "wb") as file:
         file.write(content)
 
@@ -72,7 +71,8 @@ def download_next_file(items_queue: queue.Queue, directory: str) -> None:
         url, title = items_queue.get()
         print(f"Downloading {title}: {url}")
         response = requests.get(url)
-        save_file(title, directory, response.content)
+        filename = f"{slugify(url.split("/")[-1].strip('.mp3'))}.mp3"
+        save_file(filename, directory, response.content)
 
 
 def main() -> None:
