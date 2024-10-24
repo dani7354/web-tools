@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 from threading import Thread
 from typing import Sequence
+from urllib.parse import unquote
 
 import requests
 from slugify import slugify
@@ -40,9 +41,12 @@ def read_rss_feed(url: str, directory: str, words: Sequence[str]) -> list[tuple[
 
     rss_tree = ET.ElementTree(ET.fromstring(response.content))
     items = rss_tree.findall(".//item")
-    item_tuples = filter(
-        lambda x: is_match(x, words),
-        [(x.find("enclosure").get("url"), x.findtext("title")) for x in items])
+    if words:
+        item_tuples = filter(
+            lambda x: is_match(x, words),
+            [(x.find("enclosure").get("url"), x.findtext("title")) for x in items])
+    else:
+        item_tuples = [(x.find("enclosure").get("url"), x.findtext("title")) for x in items]
 
     return list(item_tuples)
 
@@ -71,7 +75,7 @@ def download_next_file(items_queue: queue.Queue, directory: str) -> None:
         url, title = items_queue.get()
         print(f"Downloading {title}: {url}")
         response = requests.get(url)
-        filename = f"{slugify(url.split("/")[-1].strip('.mp3'))}.mp3"
+        filename = f"{slugify(unquote(url.split('/')[-1]).strip('.mp3'))}.mp3"
         save_file(filename, directory, response.content)
 
 
